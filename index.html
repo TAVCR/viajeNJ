@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itinerario de Viaje NJ 2025</title>
+    
+    <!-- 1. Cargamos React y ReactDOM desde Internet -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- 2. Cargamos Babel para entender el código moderno -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- 3. Cargamos Tailwind CSS para el diseño bonito -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración para animaciones de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos para el mapa -->
+    <style>
+        body { background-color: #0f172a; } /* Color de fondo seguro */
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- AQUÍ EMPIEZA LA APLICACIÓN -->
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- ICONOS SVG (Dibujados manualmente para no instalar librerías) ---
+        const Icons = {
+            Cloud: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-gray-100"><path d="M17.5 19c0-1.7-1.3-3-3-3c-1.7 0-3 1.3-3 3"/><path d="M22 17a5 5 0 0 0-9-5 2.5 2.5 0 0 0-5 2H6.5a4.5 4.5 0 1 0 .2 8.9"/></svg>,
+            Sun: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-yellow-200"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
+            Snowflake: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-blue-100"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>,
+            Moon: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-indigo-200"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>,
+            AlertTriangle: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>,
+            Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
+            Map: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>,
+            ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            Bus: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>,
+            Train: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>,
+            Car: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>,
+            DollarSign: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+            Smartphone: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>,
+            Home: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+            Plane: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-32 h-32"><path d="M2 12h20"/><path d="m13 2-4 10"/><path d="m13 22-4-10"/></svg>
+        };
+
+        const App = () => {
+            const [language, setLanguage] = useState('es');
+            const [activeDay, setActiveDay] = useState(1);
+
+            const toggleLanguage = () => setLanguage(prev => prev === 'es' ? 'en' : 'es');
+
+            // Coordenadas para Uber
+            const uberLink = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=40.677315&dropoff[longitude]=-74.218414&dropoff[nickname]=Casa%20Elizabeth&dropoff[formatted_address]=635%20Union%20Avenue%2C%20Elizabeth%2C%20NJ`;
+
+            const content = {
+                es: {
+                    title: "Guía de Viaje NJ 2025",
+                    subtitle: "Estrategia de Compras & Logística",
+                    dates: "05 - 08 Diciembre 2025",
+                    accommodation: "Base: 635 Union Avenue, Elizabeth, NJ",
+                    climateTitle: "Alerta Climática",
+                    climate: [
+                        { day: "Viernes", icon: <Icons.Cloud/>, text: "Nieve/Aguanieve", desc: "Suelo mojado. Botas impermeables." },
+                        { day: "Sábado", icon: <Icons.Snowflake/>, text: "Muy Frío (-2°C)", desc: "Vístete en capas para el Mall." },
+                        { day: "Domingo", icon: <Icons.Sun/>, text: "Viento Helado", desc: "Guantes obligatorios." },
+                        { day: "Lunes", icon: <Icons.Moon/>, text: "Congelante (-7°C)", desc: "Abrigo hasta el último momento." }
+                    ],
+                    alertsTitle: "⚠️ Alertas de Servicio Activas (Dic 2025)",
+                    alerts: [
+                        "Estación EWR (Domingo): 'Mejoras en la Estación' pueden causar retrasos de 15 min en trenes.",
+                        "Estación Elizabeth: Ascensor lado Este fuera de servicio. Uso obligatorio de escaleras.",
+                        "Obras Viales Union Co.: Posible tráfico lento. Pedir Uber con 15 min de antelación."
+                    ],
+                    appSection: {
+                        title: "App NJ TRANSIT (Vital)",
+                        desc: "Descárgala para ver retrasos en tiempo real.",
+                        steps: ["1. Busca 'NJ TRANSIT' en App Store.", "2. Usa 'DepartureVision'.", "3. O entra a njtransit.com"]
+                    },
+                    uberSection: {
+                        title: "Botón de Pánico: Volver a Casa",
+                        desc: "Pide un Uber directo al hospedaje desde donde estés.",
+                        buttonText: "Pedir Uber a Casa (635 Union Ave)"
+                    },
+                    helpCard: {
+                        label: "Muestre esta pantalla si necesita ayuda / Show this screen for help",
+                        title: "NECESITO IR A / I NEED TO GO TO:",
+                        address: "635 Union Avenue",
+                        city: "Elizabeth, NJ 07208",
+                        note: "Near / Cerca de: Morris Ave & Union Ave"
+                    },
+                    days: [
+                        { id: 1, label: "Vie 05", title: "Día 1: Llegada & Mall", goal: "Aterrizaje y directo a compras", steps: [
+                            { time: "05:30 AM", action: "Aterrizaje (EWR)", detail: "Terminal C. Desayuna tranquilo ahí." },
+                            { time: "09:30 AM", action: "Bus al Mall", detail: "Sal de la terminal y busca la parada de buses. Toma el NJ Transit #62 (Dir. Elizabeth) y bájate en la parada 'Jersey Gardens Mall'." },
+                            { time: "10:00 AM", action: "Shopping Mode", detail: "Alquila Smart Carte para maletas." },
+                            { time: "19:00 PM", action: "Check-in Casa", detail: "Uber obligatorio ($20-$25) por maletas." }
+                        ], mapLink: "https://www.google.com/maps/dir/Newark+Liberty+International+Airport/The+Mills+at+Jersey+Gardens" },
+                        { id: 2, label: "Sáb 06", title: "Día 2: Full Compras", goal: "Ida barata, vuelta cómoda", steps: [
+                            { time: "09:00 AM", action: "Ruta de Bus", detail: "Camina 8 min hasta Av. Morris. Toma el Bus #52 o #26 y bájate en 'Elizabeth Broad St' (Centro). Ahí mismo transborda al Bus #111 o #24 hasta el Mall." },
+                            { time: "Todo el día", action: "Maratón", detail: "Sin límite de tiempo." },
+                            { time: "19:00 PM", action: "Regreso VIP", detail: "Uber a casa con todas las bolsas ($15-$20)." }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/The+Mills+at+Jersey+Gardens" },
+                        { id: 3, label: "Dom 07", title: "Día 3: Logística", goal: "Paquetes (Newark) + Walmart (Linden)", alert: "¡OJO! Obras en vía del tren hoy.", 
+                          planB: { title: "Plan B: Autobús (Si hay retrasos)", description: "Debido a las obras, si el tren falla:", steps: ["En Broad St, busca la parada del Bus #62.", "Asegúrate que diga 'To Newark Penn Station'.", "Tiempo: ~45-50 min.", "Bajada: Última parada (Newark Penn Station)."] },
+                          steps: [
+                            { time: "08:30 AM", action: "Ruta a Newark (Plan A)", detail: "Camina a Av. Morris, toma Bus #52/#26 hasta 'Broad St'. Cruza a la estación de tren 'Elizabeth' y toma el tren NJ Transit (11 min) hasta 'Newark Penn Station'." },
+                            { time: "09:45 AM", action: "Recoger Paquete", detail: "Uber corto a 66 Napoleon St." },
+                            { time: "10:15 AM", action: "Dejar en Casa", detail: "Uber directo Napoleon -> Hospedaje." },
+                            { time: "11:30 AM", action: "Walmart Linden", detail: "Uber a 1050 W Edgar Rd (Super Center)." },
+                            { time: "13:30 PM", action: "Finalizar", detail: "Uber a casa y empacar." }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Penn+Station/66+Napoleon+St,+Newark,+NJ" },
+                        { id: 4, label: "Lun 08", title: "Día 4: Salida", goal: "Madrugada - Terminal B", steps: [
+                            { time: "02:15 AM", action: "Despertar", detail: "Abrigo a mano. Hace mucho frío." },
+                            { time: "02:30 AM", action: "Uber Aeropuerto", detail: "Destino: Terminal B (Spirit). Costo ~$28. Pedir con tiempo por obras viales." }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Liberty+International+Airport" }
+                    ],
+                    budget: { title: "Presupuesto Movilidad", total: "$155 USD", items: [{label: "Uber/Lyft", amount: "$140"}, {label: "Bus/Tren", amount: "$15"}] }
+                },
+                en: {
+                    title: "Travel Guide NJ 2025",
+                    subtitle: "Shopping & Logistics",
+                    dates: "Dec 05 - Dec 08, 2025",
+                    accommodation: "Stay: 635 Union Avenue, Elizabeth, NJ",
+                    climateTitle: "Weather Alert",
+                    climate: [
+                        { day: "Friday", icon: <Icons.Cloud/>, text: "Snow/Sleet", desc: "Wet ground. Waterproof boots." },
+                        { day: "Saturday", icon: <Icons.Snowflake/>, text: "Very Cold (-2°C)", desc: "Layer up for the Mall." },
+                        { day: "Sunday", icon: <Icons.Sun/>, text: "Freezing Wind", desc: "Gloves mandatory." },
+                        { day: "Monday", icon: <Icons.Moon/>, text: "Freezing (-7°C)", desc: "Coat on until inside." }
+                    ],
+                    alertsTitle: "⚠️ Active Service Alerts (Dec 2025)",
+                    alerts: [
+                        "EWR Station (Sunday): 'Station Improvements' may cause 15 min delays.",
+                        "Elizabeth Station: Eastbound Elevator Out of Service. Must use stairs.",
+                        "Roadwork Union Co.: Potential delays. Order Uber 15 mins early."
+                    ],
+                    appSection: {
+                        title: "NJ TRANSIT App (Vital)",
+                        desc: "Check real-time delays.",
+                        steps: ["1. Search 'NJ TRANSIT' on App Store.", "2. Use 'DepartureVision'.", "3. Or go to njtransit.com"]
+                    },
+                    uberSection: {
+                        title: "Panic Button: Ride Home",
+                        desc: "Request Uber straight home from anywhere.",
+                        buttonText: "Request Uber Home (635 Union Ave)"
+                    },
+                    helpCard: {
+                        label: "Show this screen for help",
+                        title: "I NEED TO GO TO:",
+                        address: "635 Union Avenue",
+                        city: "Elizabeth, NJ 07208",
+                        note: "Near: Morris Ave & Union Ave"
+                    },
+                    days: [
+                        { id: 1, label: "Fri 05", title: "Day 1: Arrival & Mall", goal: "Land and shop immediately", steps: [
+                            { time: "05:30 AM", action: "Land at EWR", detail: "Terminal C. Breakfast there." },
+                            { time: "09:30 AM", action: "Bus to Mall", detail: "Exit Terminal, find Bus Stop. Take NJ Transit #62 (Dir. Elizabeth). Get off at 'Jersey Gardens Mall'." },
+                            { time: "10:00 AM", action: "Shopping Mode", detail: "Rent a Smart Carte for luggage." },
+                            { time: "19:00 PM", action: "Check-in", detail: "Uber mandatory ($20-$25) due to luggage." }
+                        ], mapLink: "https://www.google.com/maps/dir/Newark+Liberty+International+Airport/The+Mills+at+Jersey+Gardens" },
+                        { id: 2, label: "Sat 06", title: "Day 2: Full Shopping", goal: "Cheap there, comfy back", steps: [
+                            { time: "09:00 AM", action: "Bus Route", detail: "Walk 8 min to Morris Ave. Take Bus #52/#26 to 'Broad St' (Center). Transfer there to Bus #111/#24 to the Mall." },
+                            { time: "All Day", action: "Shopping Marathon", detail: "No time limit." },
+                            { time: "19:00 PM", action: "VIP Return", detail: "Uber home with all bags ($15-$20)." }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/The+Mills+at+Jersey+Gardens" },
+                        { id: 3, label: "Sun 07", title: "Day 3: Logistics", goal: "Packages + Walmart", alert: "WARNING: Construction on train tracks.", 
+                          planB: { title: "Plan B: Bus Alternative", description: "If train has delays >15 mins:", steps: ["At Broad St, find Bus #62 stop.", "Ensure sign says 'To Newark Penn Station'.", "Time: ~45-50 min.", "Exit: Last stop (Newark Penn Station)."] },
+                          steps: [
+                            { time: "08:30 AM", action: "Route to Newark", detail: "Walk to Morris Ave, take Bus #52/#26 to 'Broad St'. Enter 'Elizabeth' Train Station, take NJ Transit to 'Newark Penn Station'." },
+                            { time: "09:45 AM", action: "Pickup Package", detail: "Short Uber to 66 Napoleon St." },
+                            { time: "10:15 AM", action: "Drop at Home", detail: "Uber straight Napoleon -> Stay (Safety)." },
+                            { time: "11:30 AM", action: "Walmart Linden", detail: "Uber to 1050 W Edgar Rd (Super Center)." },
+                            { time: "13:30 PM", action: "Finish", detail: "Uber home and pack." }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Penn+Station/66+Napoleon+St,+Newark,+NJ" },
+                        { id: 4, label: "Mon 08", title: "Day 4: Departure", goal: "Early Morning - Terminal B", steps: [
+                            { time: "02:15 AM", action: "Wake Up", detail: "Coat handy. Very cold." },
+                            { time: "02:30 AM", action: "Uber Airport", detail: "Dest: Terminal B (Spirit). Cost ~$28. Order early due to roadwork." }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Liberty+International+Airport" }
+                    ],
+                    budget: { title: "Mobility Budget", total: "$155 USD", items: [{label: "Uber/Lyft", amount: "$140"}, {label: "Bus/Train", amount: "$15"}] }
+                }
+            };
+
+            const t = content[language];
+            const activeDayData = t.days.find(d => d.id === activeDay);
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 font-sans text-gray-100 p-4 md:p-8">
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                        <div className="text-center md:text-left">
+                            <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-400 drop-shadow-sm">{t.title}</h1>
+                            <p className="text-indigo-200 font-medium tracking-wide mt-1">{t.subtitle}</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-sm text-center">
+                                <span className="block font-bold text-yellow-300">📅 {t.dates}</span>
+                                <span className="block text-gray-300 text-xs mt-1">🏠 {t.accommodation}</span>
+                            </div>
+                            <button onClick={toggleLanguage} className="h-12 w-12 flex items-center justify-center bg-indigo-600 rounded-full shadow-lg hover:bg-indigo-500 transition-all font-bold border-2 border-indigo-400">{language === 'es' ? 'EN' : 'ES'}</button>
+                        </div>
+                    </div>
+
+                    {/* ALERTS */}
+                    <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4 mb-6 backdrop-blur-md animate-pulse-slow">
+                        <h3 className="text-red-300 font-bold flex items-center gap-2 mb-2 text-sm uppercase">
+                            <Icons.Info /> {t.alertsTitle}
+                        </h3>
+                        <ul className="text-red-100 text-xs md:text-sm space-y-1 list-disc pl-5">
+                            {t.alerts.map((alert, idx) => <li key={idx}>{alert}</li>)}
+                        </ul>
+                    </div>
+
+                    {/* Climate */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                        {t.climate.map((item, idx) => (
+                            <div key={idx} className="bg-white/5 backdrop-blur-sm border border-white/10 p-3 rounded-lg flex flex-col items-center text-center hover:bg-white/10 transition-colors">
+                                <div className="mb-1">{item.icon}</div>
+                                <span className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">{item.day}</span>
+                                <span className="text-sm font-bold text-white leading-tight mb-1">{item.text}</span>
+                                <span className="text-[10px] text-gray-400 leading-tight">{item.desc}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Tabs */}
+                    <div className="flex justify-center mb-6 overflow-x-auto py-2">
+                        <div className="flex bg-gray-900/50 p-1 rounded-2xl border border-white/10 backdrop-blur-xl">
+                            {t.days.map((day) => (
+                                <button key={day.id} onClick={() => setActiveDay(day.id)} className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeDay === day.id ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white shadow-lg scale-105' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>{day.label}</button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="max-w-4xl mx-auto animate-fade-in">
+                        <div className="bg-white/95 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl text-gray-800 border border-white/50">
+                            <div className="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 text-white relative overflow-hidden">
+                                <h2 className="text-3xl font-black mb-1 relative z-10">{activeDayData.title}</h2>
+                                <p className="text-indigo-100 font-medium relative z-10 flex items-center gap-2"><span className="bg-white/20 px-2 py-0.5 rounded text-sm uppercase tracking-wider">Objetivo</span> {activeDayData.goal}</p>
+                            </div>
+
+                            <div className="p-6 md:p-8 grid md:grid-cols-2 gap-8">
+                                <div className="space-y-6">
+                                    {activeDayData.alert && (
+                                        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm flex gap-3 items-start animate-pulse-slow">
+                                            <Icons.AlertTriangle />
+                                            <p className="text-sm text-amber-800 font-medium">{activeDayData.alert}</p>
+                                        </div>
+                                    )}
+                                    {activeDayData.planB && (
+                                        <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 shadow-inner">
+                                            <h4 className="text-indigo-800 font-bold flex items-center gap-2 mb-2 text-sm"><Icons.Bus /> {activeDayData.planB.title}</h4>
+                                            <p className="text-xs text-indigo-600 mb-2">{activeDayData.planB.description}</p>
+                                            <ul className="text-xs text-gray-600 space-y-1 list-disc pl-4">{activeDayData.planB.steps.map((s, i) => <li key={i}>{s}</li>)}</ul>
+                                        </div>
+                                    )}
+                                    {activeDayData.steps.map((step, idx) => (
+                                        <div key={idx} className="relative pl-6 border-l-2 border-indigo-100 group">
+                                            <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-white border-4 border-indigo-500 group-hover:scale-125 transition-transform"></div>
+                                            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 mb-1">
+                                                <span className="font-mono font-bold text-indigo-600 text-lg">{step.time}</span>
+                                                <h3 className="font-bold text-gray-900 text-lg">{step.action}</h3>
+                                            </div>
+                                            <p className="text-gray-600 leading-relaxed text-sm">{step.detail}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex flex-col gap-6">
+                                    <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-inner border border-gray-200 flex flex-col h-full min-h-[300px]">
+                                        <div className="bg-gray-200 px-4 py-2 border-b border-gray-300 flex justify-between items-center relative z-10">
+                                            <span className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1"><Icons.Map /> Ruta del Día</span>
+                                            <a href={activeDayData.mapLink} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 relative z-20">Abrir GPS <Icons.ArrowRight /></a>
+                                        </div>
+                                        <div className="flex-grow bg-gray-300 flex items-center justify-center p-8 text-center text-gray-500 text-sm">
+                                            Haz clic en "Abrir GPS" para ver la ruta en Google Maps.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ADDRESS HELP CARD */}
+                    <div className="max-w-4xl mx-auto mt-8 bg-white border-2 border-indigo-200 rounded-2xl p-6 text-center shadow-xl">
+                        <p className="text-gray-500 uppercase tracking-widest text-xs font-bold mb-2 flex items-center justify-center gap-2"><Icons.Home /> {t.helpCard.label}</p>
+                        <h3 className="text-sm font-bold text-indigo-400 mb-1">{t.helpCard.title}</h3>
+                        <h2 className="text-3xl md:text-4xl font-black text-indigo-900 mb-1 leading-tight">{t.helpCard.address}</h2>
+                        <p className="text-xl text-indigo-800 font-bold mb-3">{t.helpCard.city}</p>
+                        <div className="inline-block bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium">{t.helpCard.note}</div>
+                    </div>
+
+                    {/* Uber, Budget & Apps */}
+                    <div className="max-w-4xl mx-auto mt-8 grid md:grid-cols-2 gap-4">
+                        <div onClick={() => window.open(uberLink, '_blank')} className="col-span-1 md:col-span-2 bg-gradient-to-r from-gray-900 to-black border border-white/20 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 text-white shadow-xl hover:scale-[1.01] transition-transform cursor-pointer group">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-white text-black p-3 rounded-full group-hover:bg-gray-200 transition-colors"><Icons.Car /></div>
+                                <div><h4 className="font-bold text-lg">{t.uberSection.title}</h4><p className="text-sm text-gray-400">{t.uberSection.desc}</p></div>
+                            </div>
+                            <button className="bg-white text-black font-bold py-2 px-6 rounded-full hover:bg-gray-200 transition-colors text-sm w-full md:w-auto whitespace-nowrap">{t.uberSection.buttonText}</button>
+                        </div>
+
+                        <div className="bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 p-4 rounded-2xl flex items-center gap-4 text-white shadow-lg">
+                            <div className="bg-emerald-500 p-3 rounded-full"><Icons.DollarSign /></div>
+                            <div><p className="text-emerald-200 text-xs font-bold uppercase">{t.budget.title}</p><p className="text-2xl font-black">{t.budget.total}</p></div>
+                        </div>
+
+                        <div className="bg-indigo-600/30 backdrop-blur-md border border-indigo-400/30 p-4 rounded-2xl text-white shadow-lg flex flex-col justify-between">
+                            <div className="flex items-center gap-3 mb-2"><div className="bg-indigo-500 p-2 rounded-full"><Icons.Smartphone /></div><h4 className="font-bold text-indigo-100">{t.appSection.title}</h4></div>
+                            <p className="text-xs text-indigo-200 mb-3">{t.appSection.desc}</p>
+                            <div className="space-y-1">{t.appSection.steps.map((step, idx) => <p key={idx} className="text-xs font-mono bg-black/20 p-1 rounded px-2">{step}</p>)}</div>
+                        </div>
+                    </div>
+                    
+                    <footer className="mt-8 text-center text-xs text-gray-400">Generado para Kiwiglowcr | Diciembre 2025</footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
