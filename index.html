@@ -31,6 +31,15 @@
     <!-- Estilos para el mapa -->
     <style>
         body { background-color: #0f172a; } /* Color de fondo seguro */
+        /* Ocultar barra de scroll en navegadores Webkit (Chrome, Safari) para estética */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        /* Ocultar barra de scroll en Firefox */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body>
@@ -116,7 +125,7 @@
                             { time: "Todo el día", action: "Maratón", detail: "Sin límite de tiempo." },
                             { time: "19:00 PM", action: "Regreso VIP", detail: "Uber a casa con todas las bolsas ($15-$20)." }
                         ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/The+Mills+at+Jersey+Gardens" },
-                        { id: 3, label: "Dom 07", title: "Día 3: Logística", goal: "Paquetes (Newark) + Walmart (Linden)", alert: "¡OJO! Obras en vía del tren hoy.", 
+                        { id: 3, label: "Dom 07", title: "Día 3: Logística", goal: "Paquetes + Walmart", alert: "¡OJO! Obras en vía del tren hoy.", 
                           planB: { title: "Plan B: Autobús (Si hay retrasos)", description: "Debido a las obras, si el tren falla:", steps: ["En Broad St, busca la parada del Bus #62.", "Asegúrate que diga 'To Newark Penn Station'.", "Tiempo: ~45-50 min.", "Bajada: Última parada (Newark Penn Station)."] },
                           steps: [
                             { time: "08:30 AM", action: "Ruta a Newark (Plan A)", detail: "Camina a Av. Morris, toma Bus #52/#26 hasta 'Broad St'. Cruza a la estación de tren 'Elizabeth' y toma el tren NJ Transit (11 min) hasta 'Newark Penn Station'." },
@@ -240,8 +249,8 @@
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex justify-center mb-6 overflow-x-auto py-2">
-                        <div className="flex bg-gray-900/50 p-1 rounded-2xl border border-white/10 backdrop-blur-xl">
+                    <div className="flex justify-start md:justify-center mb-6 overflow-x-auto py-2 px-4 md:px-0 scrollbar-hide">
+                        <div className="flex bg-gray-900/50 p-1 rounded-2xl border border-white/10 backdrop-blur-xl min-w-max">
                             {t.days.map((day) => (
                                 <button key={day.id} onClick={() => setActiveDay(day.id)} className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeDay === day.id ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white shadow-lg scale-105' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>{day.label}</button>
                             ))}
