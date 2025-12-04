@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Itinerario de Viaje NJ 2025</title>
     
-    <!-- 1. Cargamos React y ReactDOM desde Internet -->
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
-    <!-- 2. Cargamos Babel para entender el código moderno -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- 3. Cargamos Tailwind CSS para el diseño bonito -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Configuración para animaciones de Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -28,54 +27,55 @@
         }
     </script>
 
-    <!-- Estilos para el mapa -->
     <style>
-        body { background-color: #0f172a; } /* Color de fondo seguro */
-        /* Ocultar barra de scroll en navegadores Webkit (Chrome, Safari) para estética */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        /* Ocultar barra de scroll en Firefox */
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        body { background-color: #0f172a; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
-    <!-- AQUÍ EMPIEZA LA APLICACIÓN -->
     <script type="text/babel">
         const { useState } = React;
 
-        // --- ICONOS SVG (Dibujados manualmente para no instalar librerías) ---
+        // --- ICONOS ---
         const Icons = {
             Cloud: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-gray-100"><path d="M17.5 19c0-1.7-1.3-3-3-3c-1.7 0-3 1.3-3 3"/><path d="M22 17a5 5 0 0 0-9-5 2.5 2.5 0 0 0-5 2H6.5a4.5 4.5 0 1 0 .2 8.9"/></svg>,
             Sun: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-yellow-200"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
             Snowflake: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-blue-100"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>,
-            Moon: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-indigo-200"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>,
+            Moon: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-indigo-200"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>,
             AlertTriangle: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>,
             Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
-            Map: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>,
-            ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            Map: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>,
+            ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
             Bus: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>,
             Train: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>,
             Car: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>,
             DollarSign: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
             Smartphone: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>,
             Home: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-            Plane: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-32 h-32"><path d="M2 12h20"/><path d="m13 2-4 10"/><path d="m13 22-4-10"/></svg>
+            Plane: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M2 12h20"/><path d="m13 2-4 10"/><path d="m13 22-4-10"/></svg>,
+            Utensils: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>,
+            Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
         };
 
         const App = () => {
             const [language, setLanguage] = useState('es');
+            const [viewMode, setViewMode] = useState('itinerary');
             const [activeDay, setActiveDay] = useState(1);
+            const [contingencySunday, setContingencySunday] = useState(false);
 
             const toggleLanguage = () => setLanguage(prev => prev === 'es' ? 'en' : 'es');
 
-            // Coordenadas para Uber
             const uberLink = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=40.677315&dropoff[longitude]=-74.218414&dropoff[nickname]=Casa%20Elizabeth&dropoff[formatted_address]=635%20Union%20Avenue%2C%20Elizabeth%2C%20NJ`;
+
+            // Google Maps Embed URLs
+            const maps = {
+                mall: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.183428373673!2d-74.17578268459496!3d40.66530697933682!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24d623253a533%3A0xc47e30327f272a0c!2sThe%20Mills%20at%20Jersey%20Gardens!5e0!3m2!1sen!2sus!4v1629817345678!5m2!1sen!2sus",
+                newark: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.0296707379737!2d-74.16422968459364!3d40.73467997932917!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c2537640203f75%3A0x67390234720937c4!2sNewark%20Penn%20Station!5e0!3m2!1sen!2sus!4v1629817345678!5m2!1sen!2sus",
+                airport: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12097.436102275637!2d-74.17706398459302!3d40.68949057933454!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c2537d95e2b023%3A0xb89d1fe6bc499443!2sNewark%20Liberty%20International%20Airport%20(EWR)!5e0!3m2!1sen!2sus!4v1629817345678!5m2!1sen!2sus"
+            };
 
             const content = {
                 es: {
@@ -83,6 +83,73 @@
                     subtitle: "Estrategia de Compras & Logística",
                     dates: "05 - 08 Diciembre 2025",
                     accommodation: "Base: 635 Union Avenue, Elizabeth, NJ",
+                    tabs: { itinerary: "Itinerario", dining: "Cenas Cercanas", shopping: "Tiendas Locales" },
+                    
+                    diningTitle: "Cenas Recomendadas (Cerca del Hospedaje)",
+                    diningSubtitle: "Lugares económicos y buenos para cenar sin ir lejos.",
+                    restaurants: [
+                        { name: "Tropicana Diner & Bakery", type: "Diner Americano / Latino", price: "$$", dist: "5 min caminando", desc: "Un clásico de NJ. Menú gigante: hamburguesas, desayunos, platos latinos y postres increíbles. Abierto tarde.", loc: "545 Morris Ave" },
+                        { name: "Parador Rojo", type: "Comida Colombiana", price: "$$", dist: "10 min caminando", desc: "Comida casera abundante. Bandeja paisa, carnes, arepas. Muy buena calidad/precio.", loc: "344 Morris Ave" },
+                        { name: "Pizza Hut / Pizzería Local", type: "Comida Rápida", price: "$", dist: "3 min caminando", desc: "Opción segura y rápida si estás muy cansada.", loc: "655 Newark Ave" }
+                    ],
+
+                    shoppingTitle: "Tiendas Locales (Fuera del Mall)",
+                    shoppingSubtitle: "Opciones cercanas para electrónicos, ropa y curiosidades.",
+                    shops: [
+                        { 
+                            name: "The Market (Elizabeth Ave)", 
+                            category: "Ropa / Jeans / Joyería", 
+                            route: "Bajar en Broad St, caminar 1 cuadra.", 
+                            desc: "Calle principal de comercio latino. V.I.M (Jeans), Snipes, Joyerías.",
+                            logistics: [
+                                { label: "Transporte", val: "Bus #52 / #26" },
+                                { label: "Tiempo", val: "15-20 min" },
+                                { label: "Distancia", val: "1.5 millas" },
+                                { label: "Costo Bus", val: "$1.60 (1 Zona)" },
+                                { label: "Uber", val: "$10-$12 (Recomendado al volver)" }
+                            ]
+                        },
+                        { 
+                            name: "Shoppers World", 
+                            category: "Ropa Departamental (Descuento)", 
+                            route: "Bajar en Broad St.", 
+                            desc: "Tienda grande de descuentos. Ropa interior, uniformes y ropa casual muy barata.",
+                            logistics: [
+                                { label: "Transporte", val: "Bus #52 / #26" },
+                                { label: "Tiempo", val: "20 min" },
+                                { label: "Distancia", val: "1.8 millas" },
+                                { label: "Costo Bus", val: "$1.60" },
+                                { label: "Uber", val: "$11-$13" }
+                            ]
+                        },
+                        { 
+                            name: "Dollar Tree / Family Dollar", 
+                            category: "Juguetes / Curiosidades", 
+                            route: "Zona Broad St.", 
+                            desc: "Opciones locales para juguetes pequeños y regalos económicos.",
+                            logistics: [
+                                { label: "Transporte", val: "Bus #52 / #26" },
+                                { label: "Tiempo", val: "20 min" },
+                                { label: "Distancia", val: "1.8 millas" },
+                                { label: "Costo Bus", val: "$1.60" },
+                                { label: "Uber", val: "$11-$13 (Si llevas bolsas)" }
+                            ]
+                        },
+                        { 
+                            name: "Walgreens", 
+                            category: "Perfumes / Farmacia", 
+                            route: "Caminar hacia Newark Ave.", 
+                            desc: "Perfumes de marca (vitrina), maquillaje y electrónicos básicos.",
+                            logistics: [
+                                { label: "Transporte", val: "Caminata" },
+                                { label: "Tiempo", val: "12 min" },
+                                { label: "Distancia", val: "0.6 millas" },
+                                { label: "Costo", val: "$0 (Gratis)" },
+                                { label: "Uber", val: "No necesario ($8 min)" }
+                            ]
+                        }
+                    ],
+
                     climateTitle: "Alerta Climática",
                     climate: [
                         { day: "Viernes", icon: <Icons.Cloud/>, text: "Nieve/Aguanieve", desc: "Suelo mojado. Botas impermeables." },
@@ -115,29 +182,40 @@
                     },
                     days: [
                         { id: 1, label: "Vie 05", title: "Día 1: Llegada & Mall", goal: "Aterrizaje y directo a compras", steps: [
-                            { time: "05:30 AM", action: "Aterrizaje (EWR)", detail: "Terminal C. Desayuna tranquilo ahí." },
-                            { time: "09:30 AM", action: "Bus al Mall", detail: "Sal de la terminal y busca la parada de buses. Toma el NJ Transit #62 (Dir. Elizabeth) y bájate en la parada 'Jersey Gardens Mall'." },
+                            { time: "05:30 AM", action: "Aterrizaje (EWR)", detail: "Terminal C. Desayuna tranquila ahí." },
+                            { time: "09:30 AM", action: "Bus al Mall", detail: "Sal de la terminal y busca la parada de buses. Toma el NJ Transit #62 (Dir. Elizabeth) y bájate en la parada 'Jersey Gardens Mall'. (Costo: ~$2.55)" },
                             { time: "10:00 AM", action: "Shopping Mode", detail: "Alquila Smart Carte para maletas." },
                             { time: "19:00 PM", action: "Check-in Casa", detail: "Uber obligatorio ($20-$25) por maletas." }
-                        ], mapLink: "https://www.google.com/maps/dir/Newark+Liberty+International+Airport/The+Mills+at+Jersey+Gardens" },
+                        ], mapLink: "https://www.google.com/maps/dir/Newark+Liberty+International+Airport/The+Mills+at+Jersey+Gardens", mapUrl: maps.mall },
                         { id: 2, label: "Sáb 06", title: "Día 2: Full Compras", goal: "Ida barata, vuelta cómoda", steps: [
-                            { time: "09:00 AM", action: "Ruta de Bus", detail: "Camina 8 min hasta Av. Morris. Toma el Bus #52 o #26 y bájate en 'Elizabeth Broad St' (Centro). Ahí mismo transborda al Bus #111 o #24 hasta el Mall." },
+                            { time: "09:00 AM", action: "Bus al Mall", detail: "Camina 8 min hasta Av. Morris. Toma el Bus #52 o #26 y bájate en 'Elizabeth Broad St' (Centro). Ahí mismo transborda al Bus #111 o #24 hasta el Mall. (Costo: ~$3.00)" },
                             { time: "Todo el día", action: "Maratón", detail: "Sin límite de tiempo." },
                             { time: "19:00 PM", action: "Regreso VIP", detail: "Uber a casa con todas las bolsas ($15-$20)." }
-                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/The+Mills+at+Jersey+Gardens" },
-                        { id: 3, label: "Dom 07", title: "Día 3: Logística", goal: "Paquetes + Walmart", alert: "¡OJO! Obras en vía del tren hoy.", 
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/The+Mills+at+Jersey+Gardens", mapUrl: maps.mall },
+                        { 
+                          id: 3, 
+                          label: "Dom 07", 
+                          title: "Día 3: Logística", 
+                          goal: "Paquetes + Walmart", 
+                          alert: "¡OJO! Obras en vía del tren hoy.", 
+                          contingencyToggle: true, 
                           planB: { title: "Plan B: Autobús (Si hay retrasos)", description: "Debido a las obras, si el tren falla:", steps: ["En Broad St, busca la parada del Bus #62.", "Asegúrate que diga 'To Newark Penn Station'.", "Tiempo: ~45-50 min.", "Bajada: Última parada (Newark Penn Station)."] },
                           steps: [
-                            { time: "08:30 AM", action: "Ruta a Newark (Plan A)", detail: "Camina a Av. Morris, toma Bus #52/#26 hasta 'Broad St'. Cruza a la estación de tren 'Elizabeth' y toma el tren NJ Transit (11 min) hasta 'Newark Penn Station'." },
-                            { time: "09:45 AM", action: "Recoger Paquete", detail: "Uber corto a 66 Napoleon St." },
-                            { time: "10:15 AM", action: "Dejar en Casa", detail: "Uber directo Napoleon -> Hospedaje." },
-                            { time: "11:30 AM", action: "Walmart Linden", detail: "Uber a 1050 W Edgar Rd (Super Center)." },
-                            { time: "13:30 PM", action: "Finalizar", detail: "Uber a casa y empacar." }
-                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Penn+Station/66+Napoleon+St,+Newark,+NJ" },
+                            { time: "08:30 AM", action: "Ruta a Newark (Plan A)", detail: "Camina a Av. Morris, toma Bus #52/#26 hasta 'Broad St'. Cruza a la estación de tren 'Elizabeth' y toma el tren NJ Transit (11 min) hasta 'Newark Penn Station'. (Costo ~$5.00)" },
+                            { time: "09:45 AM", action: "Recoger Paquete", detail: "Uber corto a 66 Napoleon St. (~$8)" },
+                            { time: "10:15 AM", action: "Dejar en Casa", detail: "Uber directo Napoleon -> Hospedaje. (~$18-$22)" },
+                            { time: "11:30 AM", action: "Walmart Linden", detail: "Uber a 1050 W Edgar Rd (Super Center). (~$13-$15)" },
+                            ...(contingencySunday ? [
+                                { time: "13:30 PM", action: "Desvío -> Mall", detail: "Uber Walmart -> Jersey Gardens (Contingency) (~$15)." },
+                                { time: "17:00 PM", action: "Regreso Final", detail: "Uber Mall -> Casa. Empacar todo. (~$15-$20)." }
+                            ] : [
+                                { time: "13:30 PM", action: "Finalizar", detail: "Uber Walmart -> Casa. Empacar todo. (~$13-$15)" }
+                            ])
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Penn+Station/66+Napoleon+St,+Newark,+NJ", mapUrl: maps.newark },
                         { id: 4, label: "Lun 08", title: "Día 4: Salida", goal: "Madrugada - Terminal B", steps: [
                             { time: "02:15 AM", action: "Despertar", detail: "Abrigo a mano. Hace mucho frío." },
                             { time: "02:30 AM", action: "Uber Aeropuerto", detail: "Destino: Terminal B (Spirit). Costo ~$28. Pedir con tiempo por obras viales." }
-                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Liberty+International+Airport" }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Liberty+International+Airport", mapUrl: maps.airport }
                     ],
                     budget: { title: "Presupuesto Movilidad", total: "$155 USD", items: [{label: "Uber/Lyft", amount: "$140"}, {label: "Bus/Tren", amount: "$15"}] }
                 },
@@ -146,6 +224,73 @@
                     subtitle: "Shopping & Logistics",
                     dates: "Dec 05 - Dec 08, 2025",
                     accommodation: "Stay: 635 Union Avenue, Elizabeth, NJ",
+                    tabs: { itinerary: "Itinerary", dining: "Nearby Dining", shopping: "Local Shops" },
+
+                    diningTitle: "Recommended Dinner Spots",
+                    diningSubtitle: "Affordable & good quality places nearby.",
+                    restaurants: [
+                        { name: "Tropicana Diner & Bakery", type: "American / Latin Diner", price: "$$", dist: "5 min walk", desc: "NJ Classic. Huge menu: burgers, breakfast, latin dishes, desserts. Open late.", loc: "545 Morris Ave" },
+                        { name: "Parador Rojo", type: "Colombian Food", price: "$$", dist: "10 min walk", desc: "Hearty latin food. Steaks, arepas, rice & beans. Great value.", loc: "344 Morris Ave" },
+                        { name: "Pizza Hut / Local Pizza", type: "Fast Food", price: "$", dist: "3 min walk", desc: "Quick and safe option.", loc: "655 Newark Ave" }
+                    ],
+
+                    shoppingTitle: "Local Shops (Outside Mall)",
+                    shoppingSubtitle: "Nearby options for electronics, clothes & gifts.",
+                    shops: [
+                        { 
+                            name: "The Market (Elizabeth Ave)", 
+                            category: "Clothes / Jeans / Jewelry / Tech", 
+                            route: "Get off at Broad St, walk 1 block.", 
+                            desc: "Main latino shopping street. Look for V.I.M, Snipes, Rainbow and local jewelers.",
+                            logistics: [
+                                { label: "Transport", val: "Bus #52 / #26" },
+                                { label: "Time", val: "15-20 min" },
+                                { label: "Distance", val: "1.5 miles" },
+                                { label: "Bus Fare", val: "$1.60 (1 Zone)" },
+                                { label: "Uber", val: "$10-$12 (Rec. return)" }
+                            ]
+                        },
+                        { 
+                            name: "Shoppers World", 
+                            category: "Dept. Store (Discount)", 
+                            route: "Get off at Broad St.", 
+                            desc: "Large discount store. Very cheap casual wear, uniforms and underwear.",
+                            logistics: [
+                                { label: "Transport", val: "Bus #52 / #26" },
+                                { label: "Time", val: "20 min" },
+                                { label: "Distance", val: "1.8 miles" },
+                                { label: "Bus Fare", val: "$1.60" },
+                                { label: "Uber", val: "$11-$13" }
+                            ]
+                        },
+                        { 
+                            name: "Dollar Tree / Family Dollar", 
+                            category: "Toys / Novelties", 
+                            route: "Broad St area.", 
+                            desc: "Best option for small toys and cheap gifts.",
+                            logistics: [
+                                { label: "Transport", val: "Bus #52 / #26" },
+                                { label: "Time", val: "20 min" },
+                                { label: "Distance", val: "1.8 miles" },
+                                { label: "Bus Fare", val: "$1.60" },
+                                { label: "Uber", val: "$11-$13 (If bags)" }
+                            ]
+                        },
+                        { 
+                            name: "Walgreens", 
+                            category: "Perfumes / Pharmacy / Makeup", 
+                            route: "Walk towards Newark Ave.", 
+                            desc: "Great for brand perfumes, affordable makeup and basic electronics (cables).",
+                            logistics: [
+                                { label: "Transport", val: "Walk" },
+                                { label: "Time", val: "12 min" },
+                                { label: "Distance", val: "0.6 miles" },
+                                { label: "Fare", val: "$0 (Free)" },
+                                { label: "Uber", val: "Not needed ($8 min)" }
+                            ]
+                        }
+                    ],
+
                     climateTitle: "Weather Alert",
                     climate: [
                         { day: "Friday", icon: <Icons.Cloud/>, text: "Snow/Sleet", desc: "Wet ground. Waterproof boots." },
@@ -162,7 +307,7 @@
                     appSection: {
                         title: "NJ TRANSIT App (Vital)",
                         desc: "Check real-time delays.",
-                        steps: ["1. Search 'NJ TRANSIT' on App Store.", "2. Use 'DepartureVision'.", "3. Or go to njtransit.com"]
+                        steps: ["1. Search 'NJ TRANSIT' on App Store.", "2. Use 'DepartureVision'.", "3. O entra a njtransit.com"]
                     },
                     uberSection: {
                         title: "Panic Button: Ride Home",
@@ -179,28 +324,39 @@
                     days: [
                         { id: 1, label: "Fri 05", title: "Day 1: Arrival & Mall", goal: "Land and shop immediately", steps: [
                             { time: "05:30 AM", action: "Land at EWR", detail: "Terminal C. Breakfast there." },
-                            { time: "09:30 AM", action: "Bus to Mall", detail: "Exit Terminal, find Bus Stop. Take NJ Transit #62 (Dir. Elizabeth). Get off at 'Jersey Gardens Mall'." },
+                            { time: "09:30 AM", action: "Bus to Mall", detail: "Exit Terminal, find Bus Stop. Take NJ Transit #62 (Dir. Elizabeth). Get off at 'Jersey Gardens Mall'. (Cost: ~$2.55)" },
                             { time: "10:00 AM", action: "Shopping Mode", detail: "Rent a Smart Carte for luggage." },
                             { time: "19:00 PM", action: "Check-in", detail: "Uber mandatory ($20-$25) due to luggage." }
-                        ], mapLink: "https://www.google.com/maps/dir/Newark+Liberty+International+Airport/The+Mills+at+Jersey+Gardens" },
+                        ], mapLink: "https://www.google.com/maps/dir/Newark+Liberty+International+Airport/The+Mills+at+Jersey+Gardens", mapUrl: maps.mall },
                         { id: 2, label: "Sat 06", title: "Day 2: Full Shopping", goal: "Cheap there, comfy back", steps: [
-                            { time: "09:00 AM", action: "Bus Route", detail: "Walk 8 min to Morris Ave. Take Bus #52/#26 to 'Broad St' (Center). Transfer there to Bus #111/#24 to the Mall." },
+                            { time: "09:00 AM", action: "Bus Route", detail: "Walk 8 min to Morris Ave. Take Bus #52/#26 to 'Broad St' (Center). Transfer there to Bus #111/#24 to the Mall. (Cost: ~$3.00)" },
                             { time: "All Day", action: "Shopping Marathon", detail: "No time limit." },
                             { time: "19:00 PM", action: "VIP Return", detail: "Uber home with all bags ($15-$20)." }
-                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/The+Mills+at+Jersey+Gardens" },
-                        { id: 3, label: "Sun 07", title: "Day 3: Logistics", goal: "Packages + Walmart", alert: "WARNING: Construction on train tracks.", 
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/The+Mills+at+Jersey+Gardens", mapUrl: maps.mall },
+                        { 
+                          id: 3, 
+                          label: "Sun 07", 
+                          title: "Day 3: Logistics", 
+                          goal: "Packages + Walmart", 
+                          alert: "WARNING: Construction on train tracks.", 
+                          contingencyToggle: true,
                           planB: { title: "Plan B: Bus Alternative", description: "If train has delays >15 mins:", steps: ["At Broad St, find Bus #62 stop.", "Ensure sign says 'To Newark Penn Station'.", "Time: ~45-50 min.", "Exit: Last stop (Newark Penn Station)."] },
                           steps: [
-                            { time: "08:30 AM", action: "Route to Newark", detail: "Walk to Morris Ave, take Bus #52/#26 to 'Broad St'. Enter 'Elizabeth' Train Station, take NJ Transit to 'Newark Penn Station'." },
-                            { time: "09:45 AM", action: "Pickup Package", detail: "Short Uber to 66 Napoleon St." },
-                            { time: "10:15 AM", action: "Drop at Home", detail: "Uber straight Napoleon -> Stay (Safety)." },
-                            { time: "11:30 AM", action: "Walmart Linden", detail: "Uber to 1050 W Edgar Rd (Super Center)." },
-                            { time: "13:30 PM", action: "Finish", detail: "Uber home and pack." }
-                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Penn+Station/66+Napoleon+St,+Newark,+NJ" },
+                            { time: "08:30 AM", action: "Route to Newark", detail: "Walk to Morris Ave, take Bus #52/#26 to 'Broad St'. Enter 'Elizabeth' Train Station, take NJ Transit to 'Newark Penn Station'. (Cost ~$5.00)" },
+                            { time: "09:45 AM", action: "Pickup Package", detail: "Short Uber to 66 Napoleon St. (~$8)" },
+                            { time: "10:15 AM", action: "Drop at Home", detail: "Uber straight Napoleon -> Stay (Safety). (~$18-$22)" },
+                            { time: "11:30 AM", action: "Walmart Linden", detail: "Uber to 1050 W Edgar Rd (Super Center). (~$13-$15)" },
+                            ...(contingencySunday ? [
+                                { time: "13:30 PM", action: "Detour -> Mall", detail: "Uber Walmart -> Jersey Gardens (Contingency) (~$15)." },
+                                { time: "17:00 PM", action: "Final Return", detail: "Uber Mall -> Stay. Pack everything. (~$15-$20)." }
+                            ] : [
+                                { time: "13:30 PM", action: "Finish", detail: "Uber home and pack. (~$13-$15)" }
+                            ])
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Penn+Station/66+Napoleon+St,+Newark,+NJ", mapUrl: maps.newark },
                         { id: 4, label: "Mon 08", title: "Day 4: Departure", goal: "Early Morning - Terminal B", steps: [
                             { time: "02:15 AM", action: "Wake Up", detail: "Coat handy. Very cold." },
                             { time: "02:30 AM", action: "Uber Airport", detail: "Dest: Terminal B (Spirit). Cost ~$28. Order early due to roadwork." }
-                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Liberty+International+Airport" }
+                        ], mapLink: "https://www.google.com/maps/dir/635+Union+Avenue,+Elizabeth,+NJ/Newark+Liberty+International+Airport", mapUrl: maps.airport }
                     ],
                     budget: { title: "Mobility Budget", total: "$155 USD", items: [{label: "Uber/Lyft", amount: "$140"}, {label: "Bus/Train", amount: "$15"}] }
                 }
@@ -226,14 +382,19 @@
                         </div>
                     </div>
 
+                    {/* VIEW MODE TABS */}
+                    <div className="flex justify-center mb-6">
+                        <div className="flex bg-white/10 p-1 rounded-full border border-white/20 backdrop-blur-md">
+                            <button onClick={() => setViewMode('itinerary')} className={`px-4 md:px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${viewMode === 'itinerary' ? 'bg-white text-indigo-900 shadow-md' : 'text-indigo-200 hover:text-white'}`}><Icons.Plane className="w-4 h-4"/> <span className="hidden md:inline">{t.tabs.itinerary}</span><span className="md:hidden">Itin.</span></button>
+                            <button onClick={() => setViewMode('dining')} className={`px-4 md:px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${viewMode === 'dining' ? 'bg-white text-indigo-900 shadow-md' : 'text-indigo-200 hover:text-white'}`}><Icons.Utensils className="w-4 h-4"/> <span className="hidden md:inline">{t.tabs.dining}</span><span className="md:hidden">Cena</span></button>
+                            <button onClick={() => setViewMode('shopping')} className={`px-4 md:px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${viewMode === 'shopping' ? 'bg-white text-indigo-900 shadow-md' : 'text-indigo-200 hover:text-white'}`}><Icons.Gift className="w-4 h-4"/> <span className="hidden md:inline">{t.tabs.shopping}</span><span className="md:hidden">Tiendas</span></button>
+                        </div>
+                    </div>
+
                     {/* ALERTS */}
                     <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4 mb-6 backdrop-blur-md animate-pulse-slow">
-                        <h3 className="text-red-300 font-bold flex items-center gap-2 mb-2 text-sm uppercase">
-                            <Icons.Info /> {t.alertsTitle}
-                        </h3>
-                        <ul className="text-red-100 text-xs md:text-sm space-y-1 list-disc pl-5">
-                            {t.alerts.map((alert, idx) => <li key={idx}>{alert}</li>)}
-                        </ul>
+                        <h3 className="text-red-300 font-bold flex items-center gap-2 mb-2 text-sm uppercase"><Icons.Info /> {t.alertsTitle}</h3>
+                        <ul className="text-red-100 text-xs md:text-sm space-y-1 list-disc pl-5">{t.alerts.map((alert, idx) => <li key={idx}>{alert}</li>)}</ul>
                     </div>
 
                     {/* Climate */}
@@ -248,63 +409,149 @@
                         ))}
                     </div>
 
-                    {/* Tabs */}
-                    <div className="flex justify-start md:justify-center mb-6 overflow-x-auto py-2 px-4 md:px-0 scrollbar-hide">
-                        <div className="flex bg-gray-900/50 p-1 rounded-2xl border border-white/10 backdrop-blur-xl min-w-max">
-                            {t.days.map((day) => (
-                                <button key={day.id} onClick={() => setActiveDay(day.id)} className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeDay === day.id ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white shadow-lg scale-105' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>{day.label}</button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="max-w-4xl mx-auto animate-fade-in">
-                        <div className="bg-white/95 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl text-gray-800 border border-white/50">
-                            <div className="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 text-white relative overflow-hidden">
-                                <h2 className="text-3xl font-black mb-1 relative z-10">{activeDayData.title}</h2>
-                                <p className="text-indigo-100 font-medium relative z-10 flex items-center gap-2"><span className="bg-white/20 px-2 py-0.5 rounded text-sm uppercase tracking-wider">Objetivo</span> {activeDayData.goal}</p>
-                            </div>
-
-                            <div className="p-6 md:p-8 grid md:grid-cols-2 gap-8">
-                                <div className="space-y-6">
-                                    {activeDayData.alert && (
-                                        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm flex gap-3 items-start animate-pulse-slow">
-                                            <Icons.AlertTriangle />
-                                            <p className="text-sm text-amber-800 font-medium">{activeDayData.alert}</p>
-                                        </div>
-                                    )}
-                                    {activeDayData.planB && (
-                                        <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 shadow-inner">
-                                            <h4 className="text-indigo-800 font-bold flex items-center gap-2 mb-2 text-sm"><Icons.Bus /> {activeDayData.planB.title}</h4>
-                                            <p className="text-xs text-indigo-600 mb-2">{activeDayData.planB.description}</p>
-                                            <ul className="text-xs text-gray-600 space-y-1 list-disc pl-4">{activeDayData.planB.steps.map((s, i) => <li key={i}>{s}</li>)}</ul>
-                                        </div>
-                                    )}
-                                    {activeDayData.steps.map((step, idx) => (
-                                        <div key={idx} className="relative pl-6 border-l-2 border-indigo-100 group">
-                                            <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-white border-4 border-indigo-500 group-hover:scale-125 transition-transform"></div>
-                                            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 mb-1">
-                                                <span className="font-mono font-bold text-indigo-600 text-lg">{step.time}</span>
-                                                <h3 className="font-bold text-gray-900 text-lg">{step.action}</h3>
-                                            </div>
-                                            <p className="text-gray-600 leading-relaxed text-sm">{step.detail}</p>
-                                        </div>
+                    {/* MAIN CONTENT AREA */}
+                    {viewMode === 'itinerary' ? (
+                        <>
+                            {/* Day Tabs */}
+                            <div className="flex justify-start md:justify-center mb-6 overflow-x-auto py-2 px-4 md:px-0 scrollbar-hide">
+                                <div className="flex bg-gray-900/50 p-1 rounded-2xl border border-white/10 backdrop-blur-xl min-w-max">
+                                    {t.days.map((day) => (
+                                        <button key={day.id} onClick={() => setActiveDay(day.id)} className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeDay === day.id ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white shadow-lg scale-105' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>{day.label}</button>
                                     ))}
                                 </div>
-                                <div className="flex flex-col gap-6">
-                                    <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-inner border border-gray-200 flex flex-col h-full min-h-[300px]">
-                                        <div className="bg-gray-200 px-4 py-2 border-b border-gray-300 flex justify-between items-center relative z-10">
-                                            <span className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1"><Icons.Map /> Ruta del Día</span>
-                                            <a href={activeDayData.mapLink} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 relative z-20">Abrir GPS <Icons.ArrowRight /></a>
+                            </div>
+
+                            {/* Active Day Content */}
+                            <div className="max-w-4xl mx-auto animate-fade-in">
+                                <div className="bg-white/95 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl text-gray-800 border border-white/50">
+                                    <div className="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 text-white relative overflow-hidden">
+                                        <h2 className="text-3xl font-black mb-1 relative z-10">{activeDayData.title}</h2>
+                                        <p className="text-indigo-100 font-medium relative z-10 flex items-center gap-2"><span className="bg-white/20 px-2 py-0.5 rounded text-sm uppercase tracking-wider">Objetivo</span> {activeDayData.goal}</p>
+                                    </div>
+
+                                    <div className="p-6 md:p-8 grid md:grid-cols-2 gap-8">
+                                        <div className="space-y-6">
+                                            {activeDayData.alert && (
+                                                <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm flex gap-3 items-start animate-pulse-slow">
+                                                    <Icons.AlertTriangle />
+                                                    <p className="text-sm text-amber-800 font-medium">{activeDayData.alert}</p>
+                                                </div>
+                                            )}
+                                            {activeDayData.planB && (
+                                                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 shadow-inner">
+                                                    <h4 className="text-indigo-800 font-bold flex items-center gap-2 mb-2 text-sm"><Icons.Bus /> {activeDayData.planB.title}</h4>
+                                                    <p className="text-xs text-indigo-600 mb-2">{activeDayData.planB.description}</p>
+                                                    <ul className="text-xs text-gray-600 space-y-1 list-disc pl-4">{activeDayData.planB.steps.map((s, i) => <li key={i}>{s}</li>)}</ul>
+                                                </div>
+                                            )}
+                                            
+                                            {/* CONTINGENCY SWITCH */}
+                                            {activeDayData.contingencyToggle && (
+                                                <div className="flex items-center justify-between bg-gray-100 p-3 rounded-lg border border-gray-200">
+                                                    <span className="text-sm font-bold text-gray-700">Ver opción regreso vía Mall</span>
+                                                    <button onClick={() => setContingencySunday(!contingencySunday)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${contingencySunday ? 'bg-indigo-600' : 'bg-gray-300'}`}>
+                                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${contingencySunday ? 'translate-x-6' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {activeDayData.steps.map((step, idx) => (
+                                                <div key={idx} className="relative pl-6 border-l-2 border-indigo-100 group">
+                                                    <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-white border-4 border-indigo-500 group-hover:scale-125 transition-transform"></div>
+                                                    <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 mb-1">
+                                                        <span className="font-mono font-bold text-indigo-600 text-lg">{step.time}</span>
+                                                        <h3 className="font-bold text-gray-900 text-lg">{step.action}</h3>
+                                                    </div>
+                                                    <p className="text-gray-600 leading-relaxed text-sm">{step.detail}</p>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="flex-grow bg-gray-300 flex items-center justify-center p-8 text-center text-gray-500 text-sm">
-                                            Haz clic en "Abrir GPS" para ver la ruta en Google Maps.
+                                        <div className="flex flex-col gap-6">
+                                            <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-inner border border-gray-200 flex flex-col h-full min-h-[300px]">
+                                                <div className="bg-gray-200 px-4 py-2 border-b border-gray-300 flex justify-between items-center relative z-10">
+                                                    <span className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1"><Icons.Map /> Ruta del Día</span>
+                                                    <a href={activeDayData.mapLink} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 relative z-20">Abrir GPS <Icons.ArrowRight /></a>
+                                                </div>
+                                                <div className="flex-grow relative bg-gray-300 group">
+                                                    <iframe src={activeDayData.mapUrl} width="100%" height="100%" style={{border:0, minHeight: '300px'}} allowFullScreen="" loading="lazy" title={`Mapa del ${activeDayData.title}`} className="w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500"></iframe>
+                                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                        <p className="text-white text-xs font-medium text-center">Vista previa interactiva</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </>
+                    ) : viewMode === 'dining' ? (
+                        /* DINING VIEW */
+                        <div className="max-w-4xl mx-auto animate-fade-in">
+                            <div className="bg-white/95 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl text-gray-800 border border-white/50">
+                                <div className="bg-gradient-to-r from-pink-600 to-rose-600 p-6 text-white">
+                                    <h2 className="text-3xl font-black mb-1">{t.diningTitle}</h2>
+                                    <p className="text-pink-100 font-medium">{t.diningSubtitle}</p>
+                                </div>
+                                <div className="p-6 grid gap-4">
+                                    {t.restaurants.map((rest, idx) => (
+                                        <div key={idx} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between gap-4">
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <h3 className="font-bold text-lg text-gray-900">{rest.name}</h3>
+                                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-bold">{rest.price}</span>
+                                                </div>
+                                                <p className="text-sm text-indigo-600 font-medium mb-2">{rest.type} • {rest.dist}</p>
+                                                <p className="text-sm text-gray-600">{rest.desc}</p>
+                                            </div>
+                                            <div className="flex flex-col justify-center min-w-[140px]">
+                                                <div className="bg-gray-100 p-3 rounded-lg text-center">
+                                                    <p className="text-xs text-gray-500 font-bold uppercase mb-1">Ubicación</p>
+                                                    <p className="text-sm font-bold text-gray-800">{rest.loc}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        /* SHOPPING VIEW */
+                        <div className="max-w-4xl mx-auto animate-fade-in">
+                            <div className="bg-white/95 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl text-gray-800 border border-white/50">
+                                <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 text-white">
+                                    <h2 className="text-3xl font-black mb-1">{t.shoppingTitle}</h2>
+                                    <p className="text-emerald-100 font-medium">{t.shoppingSubtitle}</p>
+                                </div>
+                                <div className="p-6 grid gap-4">
+                                    {t.shops.map((shop, idx) => (
+                                        <div key={idx} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                                            <div className="flex flex-col gap-4">
+                                                <div>
+                                                    <h3 className="font-bold text-lg text-gray-900 mb-1">{shop.name}</h3>
+                                                    <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-md font-bold mb-2">{shop.category}</span>
+                                                    <p className="text-sm text-gray-600 mt-2 mb-4">{shop.desc}</p>
+                                                </div>
+                                                
+                                                {/* LOGISTICS TABLE */}
+                                                {shop.logistics && (
+                                                    <div className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
+                                                        <div className="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                                                            {shop.logistics.map((item, i) => (
+                                                                <div key={i} className="p-3 text-center">
+                                                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{item.label}</span>
+                                                                    <span className="block text-xs font-bold text-gray-800">{item.val}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* ADDRESS HELP CARD */}
                     <div className="max-w-4xl mx-auto mt-8 bg-white border-2 border-indigo-200 rounded-2xl p-6 text-center shadow-xl">
