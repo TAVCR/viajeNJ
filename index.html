@@ -60,7 +60,10 @@
             Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>,
             Briefcase: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
             MessageCircle: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>,
-            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>
+            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>,
+            Key: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m21 2-2 2m-7.6 7.6a6.5 6.5 0 1 1 5.3 5.3L3 21l3-3-3-3 2-2 3 3 2-2 3 3 2-2z"/></svg>,
+            Wifi: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></svg>,
+            LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         };
 
         // --- TARJETAS DE AYUDA ---
@@ -101,8 +104,20 @@
                     subtitle: "Estrategia de Compras & Logística",
                     dates: "05 - 08 Diciembre 2025",
                     accommodation: "Base: 635 Union Avenue, Elizabeth, NJ 07208",
-                    tabs: { itinerary: "Itinerario", dining: "Cenas Cercanas", shopping: "Tiendas", help: "Ayuda (Inglés)" },
+                    tabs: { itinerary: "Itinerario", dining: "Cenas Cercanas", shopping: "Tiendas", help: "Ayuda (Inglés)", access: "Acceso & WiFi" },
                     
+                    // NEW ACCESS TAB
+                    accessTitle: "Instrucciones de Llegada y Acceso",
+                    accessItems: [
+                        { icon: <Icons.Home/>, label: "Ubicación", val: "Busca el buzón blanco con el número 635." },
+                        { icon: <Icons.Key/>, label: "Puerta Principal", val: "Código: 1125✔️ (Pon la palma sobre la pantalla para activar)." },
+                        { icon: <Icons.Car/>, label: "Estacionamiento", val: "Parte trasera, frente a las jardineras." },
+                        { icon: <Icons.Briefcase/>, label: "Habitación", val: "Piso superior, puertas corredizas de vidrio." },
+                        { icon: <Icons.Key/>, label: "Puerta Habitación", val: "Código: 1234 LOGO (Presiona el logo de la marca al final)." },
+                        { icon: <Icons.LogOut/>, label: "Checkout", val: "11:00 AM" },
+                        { icon: <Icons.Wifi/>, label: "WiFi", val: "Red: FIOS-3XVPv | Pass: fig623map763due" }
+                    ],
+
                     diningTitle: "Cenas Recomendadas (Cerca del Hospedaje)",
                     diningSubtitle: "Lugares económicos y buenos para cenar sin ir lejos.",
                     restaurants: [
@@ -210,7 +225,7 @@
                             { time: "05:30 AM", action: "Aterrizaje (EWR)", detail: "Terminal C. Desayuna tranquila ahí." },
                             { time: "09:30 AM", action: "Bus al Mall", detail: "Exit Terminal, find Bus Stop. Take NJ Transit #62 (Sign: 'Elizabeth' or 'Perth Amboy') OR Bus #40 (Sign: 'Jersey Gardens'). FIRST ONE WORKS. Get off at 'Jersey Gardens Mall'. (Cost: ~$2.55)" },
                             { time: "10:00 AM", action: "Shopping Mode", detail: "Alquila Smart Carte para maletas." },
-                            { time: "19:00 PM", action: "Check-in Casa", detail: "Uber Standard ($15-$18). Solo llevas bolsas de compras." }
+                            { time: "19:00 PM", action: "Check-in Casa", detail: "Uber Standard ($15-$18). Only shopping bags & carry-on." }
                         ], mapLink: "https://www.google.com/maps/dir/Newark+Liberty+International+Airport/The+Mills+at+Jersey+Gardens", mapUrl: maps.mall },
                         { id: 2, label: "Sáb 06", title: "Día 2: Full Compras", goal: "Ida barata, vuelta cómoda", steps: [
                             { time: "09:00 AM", action: "Bus al Mall", detail: "Camina 8 min hasta Av. Morris. Toma el Bus #52 o #26 (Letrero: 'Elizabeth Broad St' o 'Center'). Bájate en 'Broad St' (~12 paradas). Ahí transborda al PRIMERO que pase: Bus #111, #24 o #62. Todos van al Mall. (Costo: ~$3.00)" },
@@ -256,7 +271,18 @@
                     subtitle: "Shopping & Logistics",
                     dates: "Dec 05 - Dec 08, 2025",
                     accommodation: "Stay: 635 Union Avenue, Elizabeth, NJ 07208",
-                    tabs: { itinerary: "Itinerary", dining: "Nearby Dining", shopping: "Local Shops", help: "Help/Speak" },
+                    tabs: { itinerary: "Itinerary", dining: "Nearby Dining", shopping: "Local Shops", help: "Help/Speak", access: "Access Info" },
+
+                    accessTitle: "Arrival & Access Instructions",
+                    accessItems: [
+                        { icon: <Icons.Home/>, label: "Location", val: "Look for white mailbox #635." },
+                        { icon: <Icons.Key/>, label: "Main Door", val: "Code: 1125✔️ (Touch screen with palm to wake up)." },
+                        { icon: <Icons.Car/>, label: "Parking", val: "Rear area, facing the planters." },
+                        { icon: <Icons.Briefcase/>, label: "Room", val: "Top floor, behind sliding glass doors." },
+                        { icon: <Icons.Key/>, label: "Room Door", val: "Code: 1234 LOGO (Press brand logo at end)." },
+                        { icon: <Icons.LogOut/>, label: "Checkout", val: "11:00 AM" },
+                        { icon: <Icons.Wifi/>, label: "WiFi", val: "Network: FIOS-3XVPv | Pass: fig623map763due" }
+                    ],
 
                     diningTitle: "Recommended Dinner Spots",
                     diningSubtitle: "Affordable & good quality places nearby.",
@@ -443,6 +469,7 @@
                             <button onClick={() => setViewMode('dining')} className={`px-3 md:px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${viewMode === 'dining' ? 'bg-white text-indigo-900 shadow-md' : 'text-indigo-200 hover:text-white'}`}><Icons.Utensils className="w-4 h-4"/> <span className="hidden md:inline">{t.tabs.dining}</span><span className="md:hidden">Cena</span></button>
                             <button onClick={() => setViewMode('shopping')} className={`px-3 md:px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${viewMode === 'shopping' ? 'bg-white text-indigo-900 shadow-md' : 'text-indigo-200 hover:text-white'}`}><Icons.Gift className="w-4 h-4"/> <span className="hidden md:inline">{t.tabs.shopping}</span><span className="md:hidden">Tiendas</span></button>
                             <button onClick={() => setViewMode('help')} className={`px-3 md:px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${viewMode === 'help' ? 'bg-white text-indigo-900 shadow-md' : 'text-indigo-200 hover:text-white'}`}><Icons.MessageCircle className="w-4 h-4"/> <span className="hidden md:inline">{t.tabs.help}</span><span className="md:hidden">Ayuda</span></button>
+                            <button onClick={() => setViewMode('access')} className={`px-3 md:px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${viewMode === 'access' ? 'bg-white text-indigo-900 shadow-md' : 'text-indigo-200 hover:text-white'}`}><Icons.Key className="w-4 h-4"/> <span className="hidden md:inline">{t.tabs.access}</span><span className="md:hidden">Acceso</span></button>
                         </div>
                     </div>
 
@@ -604,6 +631,29 @@
                                                         </div>
                                                     </div>
                                                 )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : viewMode === 'access' ? (
+                        /* ACCESS VIEW (NEW) */
+                        <div className="max-w-4xl mx-auto animate-fade-in">
+                            <div className="bg-white/95 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl text-gray-800 border border-white/50">
+                                <div className="bg-gradient-to-r from-teal-600 to-cyan-600 p-6 text-white">
+                                    <h2 className="text-3xl font-black mb-1">{t.accessTitle}</h2>
+                                    <p className="text-teal-100 font-medium">Información de llegada y casa.</p>
+                                </div>
+                                <div className="p-6 grid gap-4">
+                                    {t.accessItems.map((item, idx) => (
+                                        <div key={idx} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-start gap-4">
+                                            <div className="bg-teal-100 p-3 rounded-full text-teal-700">
+                                                {item.icon}
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{item.label}</p>
+                                                <p className="text-lg font-bold text-gray-800">{item.val}</p>
                                             </div>
                                         </div>
                                     ))}
